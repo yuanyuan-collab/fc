@@ -1,0 +1,11 @@
+# 工作记忆与本地辅助目录（不部署）
+.workbuddy/
+
+# 网页上传用的打包目录（本地生成，不进仓库）
+release/
+
+# macOS
+.DS_Store
+
+# 依赖
+node_modules/
