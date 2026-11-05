@@ -540,3 +540,32 @@ html, body {
   color: rgba(255, 255, 255, 0.9);
   border-color: rgba(255, 255, 255, 0.25);
 }
+
+/* ============ 国风主题增强（theme.style = "guofeng"） ============ */
+#app[data-style="guofeng"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(92% 46% at 10% 0%, rgba(168, 67, 47, 0.06), transparent 62%),
+    radial-gradient(82% 44% at 92% 100%, rgba(78, 100, 88, 0.085), transparent 66%);
+}
+
+#app[data-style="guofeng"] .progress-bar { background: var(--accent); }
+
+#app[data-style="guofeng"] .home-title { letter-spacing: 1px; }
+
+#app[data-style="guofeng"] .result-card::before {
+  content: "";
+  display: block;
+  width: 26px;
+  height: 2px;
+  margin: -10px auto 28px;
+  background: var(--accent);
+}
+
+#app[data-style="guofeng"] .result-soulmate {
+  border-style: solid;
+  border-color: var(--line);
+}

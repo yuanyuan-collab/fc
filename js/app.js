@@ -60,6 +60,10 @@
     // 移动端浏览器地址栏配色
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta && theme.bg && theme.bg.charAt(0) === '#') meta.setAttribute('content', theme.bg);
+
+    // 风格标记（如 guofeng 会启用额外的国风纹理）
+    var app = document.getElementById('app');
+    if (app) app.setAttribute('data-style', theme.style || '');
   }
 
   /* ---------- 首页 ---------- */
@@ -68,6 +72,7 @@
     document.title = q.title;
 
     $('home-emoji').textContent = q.emoji || '';
+    $('home-emoji').hidden = !q.emoji;
     $('home-title').textContent = q.title || '';
     $('home-subtitle').textContent = q.subtitle || '';
     $('home-desc').textContent = q.description || '';
@@ -181,20 +186,25 @@
     var scores = {};
     state.quiz.questions.forEach(function (q, qi) {
       var opt = q.options[state.answers[qi]];
-      if (!opt) return;
+      if (!opt || !opt.scores) return;
       Object.keys(opt.scores).forEach(function (key) {
         scores[key] = (scores[key] || 0) + opt.scores[key];
       });
     });
     state.scores = scores;
 
-    // 结果类型：最高分者，平分取定义顺序靠前者
-    var best = null, bestVal = -1;
-    Object.keys(state.quiz.results).forEach(function (key) {
-      var v = scores[key] || 0;
-      if (v >= bestVal) { bestVal = v; best = key; }
-    });
-    state.resultKey = best;
+    if (state.quiz.matrix && state.quiz.matrix.results) {
+      // 向量模式：找与作答向量最接近的结果
+      state.resultKey = matchByVector();
+    } else {
+      // 计分模式：最高分者，平分取定义顺序靠前者
+      var best = null, bestVal = -1;
+      Object.keys(state.quiz.results).forEach(function (key) {
+        var v = scores[key] || 0;
+        if (v >= bestVal) { bestVal = v; best = key; }
+      });
+      state.resultKey = best;
+    }
 
     // 综合分：基于每个选项的 charm 值（1-10）
     var totalCharm = 0, cnt = 0;
@@ -217,8 +227,63 @@
     setTimeout(renderResult, 1100);
   }
 
-  function computeDims(charmScore) {
+  // 向量匹配：把作答转成「相对每题均值的偏好偏移」，再与名人偏移做余弦相似度比较
+  // （直接用平均向量会趋中，导致少数「中性」名人通吃）
+  function matchByVector() {
     var q = state.quiz;
+    var keys = Object.keys(q.matrix.results);
+    var firstKey = keys[0];
+    var dims = (q.matrix.dimensions || []).length || (q.matrix.results[firstKey] || []).length;
+    var off = new Array(dims).fill(0);
+    var n = 0;
+
+    q.questions.forEach(function (qq, qi) {
+      var ai = state.answers[qi];
+      if (ai < 0) return;
+      var opt = qq.options[ai];
+      if (!opt || !opt.vector) return;
+      var mean = new Array(dims).fill(0);
+      qq.options.forEach(function (o) {
+        for (var i = 0; i < dims; i++) mean[i] += (o.vector[i] || 0);
+      });
+      for (var i = 0; i < dims; i++) {
+        mean[i] /= qq.options.length;
+        off[i] += (opt.vector[i] || 0) - mean[i];
+      }
+      n++;
+    });
+    if (!n) return firstKey;
+    for (var j = 0; j < dims; j++) off[j] /= n;
+
+    // 全体名人的均值中心
+    var rMean = new Array(dims).fill(0);
+    keys.forEach(function (k) {
+      var rv = q.matrix.results[k];
+      for (var i = 0; i < dims; i++) rMean[i] += (rv[i] || 0);
+    });
+    for (var m = 0; m < dims; m++) rMean[m] /= keys.length;
+
+    var norm = 0;
+    for (var a = 0; a < dims; a++) norm += off[a] * off[a];
+    norm = Math.sqrt(norm) || 1;
+
+    var best = null, bestCos = -Infinity;
+    keys.forEach(function (k) {
+      var rv = q.matrix.results[k];
+      var dot = 0, rn = 0;
+      for (var i = 0; i < dims; i++) {
+        var rvOff = (rv[i] || 0) - rMean[i];
+        dot += off[i] * rvOff;
+        rn += rvOff * rvOff;
+      }
+      rn = Math.sqrt(rn) || 1;
+      var cos = dot / (norm * rn);
+      if (cos > bestCos) { bestCos = cos; best = k; }
+    });
+    return best;
+  }
+
+  function computeDims(charmScore) {    var q = state.quiz;
     if (!q.dimensions || !q.dimensions.length) return [];
     return q.dimensions.map(function (dim) {
       var actual = 0, max = 0;
@@ -253,6 +318,7 @@
 
     $('result-badge').textContent = label('resultBadge', '测试结果');
     $('result-emoji').textContent = r.emoji || '';
+    $('result-emoji').hidden = !r.emoji;
     $('result-name').textContent = r.name;
     $('result-tagline').textContent = r.tagline ? '「' + r.tagline + '」' : '';
     $('result-desc').textContent = r.description;
