@@ -9,12 +9,29 @@
     "primary": "#a78bfa",
     "accent": "#f0abfc",
     "gold": "#ffd700",
-    "cardBg": "rgba(255, 255, 255, 0.08)",
-    "cardBorder": "rgba(167, 139, 250, 0.35)",
+    "surface": "rgba(255, 255, 255, 0.07)",
+    "surfaceStrong": "rgba(255, 255, 255, 0.13)",
+    "line": "rgba(255, 255, 255, 0.15)",
+    "cardBg": "rgba(255, 255, 255, 0.06)",
+    "cardShadow": "none",
+    "btnBg": "#f5f3ff",
+    "btnText": "#1a0533",
     "textMain": "#f5f3ff",
     "textSub": "rgba(230, 220, 255, 0.72)",
     "decorEmojis": ["✨", "🌙", "⭐", "🔮", "💫"],
     "btnStyle": "gradient"
+  },
+  "labels": {
+    "startBtn": "开始觉醒",
+    "homeTip": "人已觉醒天赋",
+    "resultBadge": "你的异世界天赋",
+    "skillsHeading": "天赋技能详解",
+    "soulmatePrefix": "最佳拍档",
+    "loadingText": "正在解析你的天赋",
+    "shareBadge": "我的异世界天赋",
+    "shareAsk": "你的天赋是什么？",
+    "downloadName": "异世界天赋",
+    "swipeHint": "点选作答 · 左右滑动切换"
   },
   "questions": [
     {

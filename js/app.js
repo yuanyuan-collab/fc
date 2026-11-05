@@ -1,9 +1,9 @@
 /* =========================================================
- * 趣味测试 H5 引擎
- * - 从 data/*.json 加载测试（每个测试一个独立数据文件）
- * - 主题由 JSON theme 字段驱动（CSS 变量注入）
- * - 触摸优化：点选自动前进、左右滑动翻题、按压反馈
- * - 结果页 + Canvas 生成带二维码的分享图
+ * 极简风测试 H5 引擎
+ * - 数据驱动：data/<id>.json（每个测试独立）
+ * - 首屏不预渲染任何测试文案，数据就绪后一次性展示
+ * - 支持综合评分 + 多维度评分
+ * - Canvas 生成带二维码的极简分享图
  * ========================================================= */
 (function () {
   'use strict';
@@ -16,68 +16,76 @@
     current: 0,
     scores: {},
     answers: [],
-    locked: false
+    locked: false,
+    charmScore: 0,
+    dims: []
   };
+
+  /* ---------- 配置文案（避免把某个测试的文案写死） ---------- */
+  function label(key, fallback) {
+    var L = (state.quiz && state.quiz.labels) || {};
+    var v = L[key];
+    return (v === undefined || v === null || v === '') ? fallback : v;
+  }
 
   /* ---------- 屏幕切换 ---------- */
   function showScreen(name) {
     var screens = document.querySelectorAll('.screen');
     for (var i = 0; i < screens.length; i++) screens[i].classList.remove('active');
-    $('screen-' + name).classList.add('active');
-  }
-
-  /* ---------- 装饰星空 ---------- */
-  function buildDecor(containerId, emojis) {
-    var layer = $(containerId);
-    if (!layer) return;
-    layer.innerHTML = '';
-    var n = 14;
-    for (var i = 0; i < n; i++) {
-      var s = document.createElement('span');
-      s.className = 'star';
-      s.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      s.style.left = Math.random() * 100 + '%';
-      s.style.top = Math.random() * 100 + '%';
-      s.style.fontSize = 10 + Math.random() * 16 + 'px';
-      s.style.setProperty('--tw-dur', 2 + Math.random() * 3 + 's');
-      s.style.animationDelay = Math.random() * 3 + 's';
-      layer.appendChild(s);
-    }
+    var el = $('screen-' + name);
+    if (el) el.classList.add('active');
   }
 
   /* ---------- 主题注入 ---------- */
   function applyTheme(theme) {
+    if (!theme) return;
     var r = document.documentElement.style;
-    r.setProperty('--bg', theme.bg);
-    r.setProperty('--primary', theme.primary);
-    r.setProperty('--accent', theme.accent);
-    r.setProperty('--gold', theme.gold || '#ffd700');
-    r.setProperty('--card-bg', theme.cardBg);
-    r.setProperty('--card-border', theme.cardBorder);
-    r.setProperty('--text-main', theme.textMain);
-    r.setProperty('--text-sub', theme.textSub);
+    var map = {
+      '--bg': theme.bg,
+      '--primary': theme.primary,
+      '--accent': theme.accent,
+      '--surface': theme.surface,
+      '--surface-strong': theme.surfaceStrong,
+      '--line': theme.line,
+      '--card-bg': theme.cardBg,
+      '--card-shadow': theme.cardShadow,
+      '--btn-bg': theme.btnBg,
+      '--btn-text': theme.btnText,
+      '--text-main': theme.textMain,
+      '--text-sub': theme.textSub
+    };
+    Object.keys(map).forEach(function (k) {
+      if (map[k]) r.setProperty(k, map[k]);
+    });
+    // 移动端浏览器地址栏配色
+    var meta = document.querySelector('meta[name="theme-color"]');
+    if (meta && theme.bg && theme.bg.charAt(0) === '#') meta.setAttribute('content', theme.bg);
   }
 
-  /* ---------- 初始化首页 ---------- */
+  /* ---------- 首页 ---------- */
   function initHome() {
     var q = state.quiz;
     document.title = q.title;
-    $('home-emoji').textContent = q.emoji;
-    $('home-title').textContent = q.title;
+
+    $('home-emoji').textContent = q.emoji || '';
+    $('home-title').textContent = q.title || '';
     $('home-subtitle').textContent = q.subtitle || '';
     $('home-desc').textContent = q.description || '';
+    $('btn-start-text').textContent = label('startBtn', '开始测试');
+    $('swipe-hint').textContent = label('swipeHint', '点选作答 · 左右滑动切换');
+    $('loading-text').textContent = label('loadingText', '正在计算');
+
     var base = 12000 + Math.floor(Math.random() * 3000);
     var played = parseInt(localStorage.getItem('played_' + q.id) || '0', 10);
-    $('play-count').textContent = (base + played).toLocaleString();
-    buildDecor('decor-home', q.theme.decorEmojis);
+    var tip = document.querySelector('.home-tip');
+    if (tip) tip.innerHTML = (base + played).toLocaleString() + ' ' + label('homeTip', '人已完成');
   }
 
-  /* ---------- 答题逻辑 ---------- */
+  /* ---------- 答题 ---------- */
   function startQuiz() {
     state.current = 0;
     state.scores = {};
     state.answers = new Array(state.quiz.questions.length).fill(-1);
-    buildDecor('decor-quiz', state.quiz.theme.decorEmojis);
     showScreen('quiz');
     renderQuestion(0, null);
   }
@@ -95,7 +103,7 @@
     $('quiz-pct').textContent = pct + '%';
     $('progress-bar').style.width = pct + '%';
 
-    $('q-num').textContent = 'Q' + (index + 1);
+    $('q-num').textContent = String(index + 1).padStart(2, '0');
     $('q-text').textContent = q.text;
 
     var box = $('options');
@@ -122,31 +130,22 @@
     state.locked = true;
     btn.classList.add('picked');
     state.answers[state.current] = optIndex;
-
-    // 轻微震动反馈（支持的设备）
-    if (navigator.vibrate) navigator.vibrate(15);
+    if (navigator.vibrate) navigator.vibrate(12);
 
     setTimeout(function () {
       var total = state.quiz.questions.length;
-      if (state.current < total - 1) {
-        goQuestion(state.current + 1, 'next');
-      } else {
-        finishQuiz();
-      }
-    }, 320);
+      if (state.current < total - 1) goQuestion(state.current + 1, 'next');
+      else finishQuiz();
+    }, 300);
   }
 
   function goQuestion(index, direction) {
-    if (state.locked && direction !== null) {
-      // 滑动时若刚选中则忽略
-    }
     var card = $('question-card');
-    var outClass = direction === 'next' ? 'slide-out-left' : 'slide-out-right';
-    card.classList.add(outClass);
+    card.classList.add(direction === 'next' ? 'slide-out-left' : 'slide-out-right');
     setTimeout(function () {
       state.current = index;
       renderQuestion(index, direction);
-    }, 200);
+    }, 190);
   }
 
   /* ---------- 滑动翻页 ---------- */
@@ -189,7 +188,7 @@
     });
     state.scores = scores;
 
-    // 最高分天赋；平分则取在 results 中定义顺序靠前者
+    // 结果类型：最高分者，平分取定义顺序靠前者
     var best = null, bestVal = -1;
     Object.keys(state.quiz.results).forEach(function (key) {
       var v = scores[key] || 0;
@@ -197,62 +196,136 @@
     });
     state.resultKey = best;
 
+    // 综合分：基于每个选项的 charm 值（1-10）
+    var totalCharm = 0, cnt = 0;
+    state.quiz.questions.forEach(function (q, qi) {
+      var opt = q.options[state.answers[qi]];
+      if (!opt) return;
+      totalCharm += (typeof opt.charm === 'number' ? opt.charm : 8);
+      cnt++;
+    });
+    var avg = cnt ? totalCharm / cnt : 0;
+    state.charmScore = Math.max(1, Math.min(100, Math.round(avg * 10)));
+
+    // 维度分：由类型得分按权重推导
+    state.dims = computeDims(state.charmScore);
+
     var played = parseInt(localStorage.getItem('played_' + state.quiz.id) || '0', 10);
     localStorage.setItem('played_' + state.quiz.id, String(played + 1));
 
-    buildDecor('decor-loading', state.quiz.theme.decorEmojis);
     showScreen('loading');
-    setTimeout(function () { renderResult(); }, 1400);
+    setTimeout(renderResult, 1100);
+  }
+
+  function computeDims(charmScore) {
+    var q = state.quiz;
+    if (!q.dimensions || !q.dimensions.length) return [];
+    return q.dimensions.map(function (dim) {
+      var actual = 0, max = 0;
+      q.questions.forEach(function (qq, qi) {
+        var bestOpt = 0;
+        qq.options.forEach(function (opt) {
+          var v = 0;
+          Object.keys(dim.weights).forEach(function (k) {
+            v += (opt.scores[k] || 0) * dim.weights[k];
+          });
+          if (v > bestOpt) bestOpt = v;
+        });
+        max += bestOpt;
+        var chosen = qq.options[state.answers[qi]];
+        if (chosen) {
+          Object.keys(dim.weights).forEach(function (k) {
+            actual += (chosen.scores[k] || 0) * dim.weights[k];
+          });
+        }
+      });
+      var ratio = max > 0 ? actual / max : 0.6;
+      var score = Math.round(charmScore * (0.86 + ratio * 0.3));
+      score = Math.max(1, Math.min(100, score));
+      return { name: dim.name, score: score, ratio: ratio };
+    });
   }
 
   /* ---------- 结果页 ---------- */
   function renderResult() {
     var q = state.quiz;
     var r = q.results[state.resultKey];
-    var root = document.documentElement.style;
-    root.setProperty('--result-color', r.color);
-    root.setProperty('--result-glow', r.color);
 
-    $('result-emoji').textContent = r.emoji;
+    $('result-badge').textContent = label('resultBadge', '测试结果');
+    $('result-emoji').textContent = r.emoji || '';
     $('result-name').textContent = r.name;
-    $('result-title').textContent = r.title;
-    $('result-tagline').textContent = '「' + r.tagline + '」';
+    $('result-tagline').textContent = r.tagline ? '「' + r.tagline + '」' : '';
     $('result-desc').textContent = r.description;
 
     var traitsBox = $('result-traits');
     traitsBox.innerHTML = '';
-    r.traits.forEach(function (t) {
+    (r.traits || []).forEach(function (t) {
       var tag = document.createElement('span');
       tag.className = 'trait-tag';
-      tag.textContent = '# ' + t;
+      tag.textContent = t;
       traitsBox.appendChild(tag);
     });
 
     var skillsBox = $('result-skills');
     skillsBox.innerHTML = '';
-    var heading = document.createElement('div');
-    heading.className = 'skills-heading';
-    heading.textContent = '⚔ 觉醒技能详解 ⚔';
-    skillsBox.appendChild(heading);
-    r.skills.forEach(function (s, i) {
-      var item = document.createElement('div');
-      item.className = 'skill-item';
-      item.innerHTML =
-        '<div class="skill-icon">' + (i + 1) + '</div>' +
-        '<div><div class="skill-name">' + s.name + '</div>' +
-        '<div class="skill-desc">' + s.desc + '</div></div>';
-      skillsBox.appendChild(item);
-    });
+    if (r.skills && r.skills.length) {
+      var heading = document.createElement('div');
+      heading.className = 'skills-heading';
+      heading.textContent = label('skillsHeading', '详细解析');
+      skillsBox.appendChild(heading);
+      r.skills.forEach(function (s, i) {
+        var item = document.createElement('div');
+        item.className = 'skill-item';
+        item.innerHTML =
+          '<div class="skill-icon">0' + (i + 1) + '</div>' +
+          '<div><div class="skill-name">' + s.name + '</div>' +
+          '<div class="skill-desc">' + s.desc + '</div></div>';
+        skillsBox.appendChild(item);
+      });
+    }
 
-    $('result-soulmate').innerHTML = '💞 最佳拍档：<b>' + r.soulmate + '</b>，快 @ TA 来测！';
+    if (r.soulmate) {
+      $('result-soulmate').innerHTML =
+        label('soulmatePrefix', '最匹配') + '：<b>' + r.soulmate + '</b>';
+      $('result-soulmate').hidden = false;
+    } else {
+      $('result-soulmate').hidden = true;
+    }
 
-    buildDecor('decor-result', q.theme.decorEmojis);
+    // 评分模块：只有配置了分数才展示
+    var block = $('score-block');
+    if (q.dimensions && q.dimensions.length) {
+      block.hidden = false;
+      $('score-num').textContent = state.charmScore;
+      $('score-caption').textContent = label('scoreCaption', '综合评分');
+
+      var dimsBox = $('dims');
+      dimsBox.innerHTML = '';
+      state.dims.forEach(function (d) {
+        var row = document.createElement('div');
+        row.className = 'dim-row';
+        row.innerHTML =
+          '<div class="dim-head"><span>' + d.name + '</span><b>' + d.score + '</b></div>' +
+          '<div class="dim-track"><div class="dim-fill"></div></div>';
+        dimsBox.appendChild(row);
+      });
+      // 下一帧再触发宽度动画
+      requestAnimationFrame(function () {
+        var fills = dimsBox.querySelectorAll('.dim-fill');
+        state.dims.forEach(function (d, i) {
+          if (fills[i]) fills[i].style.width = d.score + '%';
+        });
+      });
+    } else {
+      block.hidden = true;
+    }
+
     showScreen('result');
     var scroll = document.querySelector('.result-scroll');
     if (scroll) scroll.scrollTop = 0;
   }
 
-  /* ---------- 分享图生成 ---------- */
+  /* ---------- Canvas 工具 ---------- */
   function roundRect(ctx, x, y, w, h, r) {
     ctx.beginPath();
     ctx.moveTo(x + r, y);
@@ -278,202 +351,187 @@
     return lines;
   }
 
+  /* ---------- 分享图（极简白底） ---------- */
   function generateShareImage() {
     var q = state.quiz;
     var r = q.results[state.resultKey];
     var share = q.share || {};
+    var hasScore = !!(q.dimensions && q.dimensions.length);
 
     var W = 750, H = 1334;
     var canvas = document.createElement('canvas');
-    canvas.width = W; canvas.height = H;
+    canvas.width = W;
+    canvas.height = H;
     var ctx = canvas.getContext('2d');
-
-    // 背景渐变（使用结果天赋色）
-    var g = ctx.createLinearGradient(0, 0, W, H);
-    var grad = r.gradient || ['#2d1b69', '#0f3460'];
-    g.addColorStop(0, grad[0]);
-    g.addColorStop(1, grad[1]);
-    ctx.fillStyle = g;
-    ctx.fillRect(0, 0, W, H);
-
-    // 装饰光斑
-    ctx.globalAlpha = 0.12;
-    for (var i = 0; i < 6; i++) {
-      var cx = Math.random() * W, cy = Math.random() * H, cr = 60 + Math.random() * 140;
-      var rg = ctx.createRadialGradient(cx, cy, 0, cx, cy, cr);
-      rg.addColorStop(0, '#ffffff');
-      rg.addColorStop(1, 'rgba(255,255,255,0)');
-      ctx.fillStyle = rg;
-      ctx.fillRect(cx - cr, cy - cr, cr * 2, cr * 2);
-    }
-    ctx.globalAlpha = 1;
-
-    // 星星点缀
-    ctx.fillStyle = 'rgba(255,255,255,0.7)';
-    for (var j = 0; j < 40; j++) {
-      var sx = Math.random() * W, sy = Math.random() * H, sr = Math.random() * 2.2 + 0.5;
-      ctx.beginPath(); ctx.arc(sx, sy, sr, 0, Math.PI * 2); ctx.fill();
-    }
-
+    var INK = '#1c1c1c';
+    var SUB = '#8b8680';
+    var LINE = 'rgba(28,28,28,0.09)';
     var cx = W / 2;
+
+    // 背景
+    ctx.fillStyle = '#f7f5f2';
+    ctx.fillRect(0, 0, W, H);
 
     // 顶部标题
     ctx.textAlign = 'center';
-    ctx.fillStyle = 'rgba(255,255,255,0.85)';
-    ctx.font = '600 30px "PingFang SC", "Microsoft YaHei", sans-serif';
-    ctx.fillText('✦ ' + (share.slogan || q.title) + ' ✦', cx, 92);
+    ctx.fillStyle = SUB;
+    ctx.font = '400 22px "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.fillText(share.slogan || q.title, cx, 62);
 
-    // 主卡片
-    var cardX = 55, cardY = 130, cardW = W - 110, cardH = 880;
+    // 主卡
+    var cardX = 48, cardY = 96, cardW = W - 96, cardH = hasScore ? 880 : 860;
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.35)';
-    ctx.shadowBlur = 40;
-    ctx.shadowOffsetY = 12;
-    roundRect(ctx, cardX, cardY, cardW, cardH, 32);
-    ctx.fillStyle = 'rgba(255,255,255,0.97)';
+    ctx.shadowColor = 'rgba(0,0,0,0.05)';
+    ctx.shadowBlur = 30;
+    ctx.shadowOffsetY = 8;
+    roundRect(ctx, cardX, cardY, cardW, cardH, 20);
+    ctx.fillStyle = '#ffffff';
     ctx.fill();
     ctx.restore();
 
     // 徽章
-    ctx.fillStyle = r.color;
-    ctx.font = '700 22px "PingFang SC", sans-serif';
-    var badgeText = '我的异世界天赋';
-    var bw = ctx.measureText(badgeText).width + 48;
-    roundRect(ctx, cx - bw / 2, cardY + 42, bw, 44, 22);
-    ctx.globalAlpha = 0.14; ctx.fill(); ctx.globalAlpha = 1;
-    ctx.fillStyle = r.color;
-    ctx.fillText(badgeText, cx, cardY + 73);
+    ctx.fillStyle = SUB;
+    ctx.font = '400 19px "PingFang SC", sans-serif';
+    ctx.fillText(label('shareBadge', '我的测试结果'), cx, cardY + 62);
 
-    // 天赋 emoji
-    ctx.font = '110px sans-serif';
-    ctx.fillText(r.emoji, cx, cardY + 210);
+    // emoji
+    ctx.font = '76px sans-serif';
+    ctx.fillText(r.emoji || '', cx, cardY + 150);
 
-    // 天赋名
-    ctx.fillStyle = '#22103f';
-    ctx.font = '800 58px "PingFang SC", "Microsoft YaHei", sans-serif';
-    ctx.fillText(r.name, cx, cardY + 300);
+    // 名称
+    ctx.fillStyle = INK;
+    ctx.font = '600 46px "PingFang SC", "Microsoft YaHei", sans-serif';
+    ctx.fillText(r.name, cx, cardY + 216);
 
-    // 天赋等级
-    ctx.font = '700 26px "PingFang SC", sans-serif';
-    var tw = ctx.measureText(r.title).width + 44;
-    var tg = ctx.createLinearGradient(cx - tw / 2, 0, cx + tw / 2, 0);
-    tg.addColorStop(0, r.color);
-    tg.addColorStop(1, grad[0]);
-    roundRect(ctx, cx - tw / 2, cardY + 330, tw, 48, 24);
-    ctx.fillStyle = tg;
-    ctx.fill();
-    ctx.fillStyle = '#ffffff';
-    ctx.fillText(r.title, cx, cardY + 364);
+    var y = cardY + 216;
+
+    if (hasScore) {
+      // 综合分
+      ctx.textAlign = 'center';
+      ctx.fillStyle = INK;
+      ctx.font = '200 104px "PingFang SC", "Helvetica Neue", sans-serif';
+      ctx.fillText(String(state.charmScore), cx - 16, y + 130);
+
+      // /100
+      ctx.fillStyle = SUB;
+      ctx.font = '400 22px "PingFang SC", sans-serif';
+      var numW = ctx.measureText(String(state.charmScore)).width;
+      // 用固定偏移放右侧
+      ctx.fillText('/100', cx + 70, y + 108);
+
+      ctx.fillStyle = SUB;
+      ctx.font = '400 17px "PingFang SC", sans-serif';
+      ctx.fillText(label('scoreCaption', '综合评分'), cx, y + 170);
+
+      // 维度
+      var dimTop = y + 210;
+      var barX = cardX + 62, barW = cardW - 124;
+      state.dims.forEach(function (d, i) {
+        var ly = dimTop + i * 56;
+        ctx.textAlign = 'left';
+        ctx.fillStyle = SUB;
+        ctx.font = '400 20px "PingFang SC", sans-serif';
+        ctx.fillText(d.name, barX, ly);
+
+        ctx.textAlign = 'right';
+        ctx.fillStyle = INK;
+        ctx.font = '500 20px "PingFang SC", sans-serif';
+        ctx.fillText(String(d.score), barX + barW, ly);
+
+        ctx.fillStyle = LINE;
+        ctx.fillRect(barX, ly + 12, barW, 3);
+        ctx.fillStyle = INK;
+        ctx.fillRect(barX, ly + 12, Math.round(barW * d.score / 100), 3);
+      });
+
+      y = dimTop + state.dims.length * 56 - 20;
+    }
+
+    // 分隔线
+    ctx.fillStyle = LINE;
+    ctx.fillRect(cardX + 62, y + 34, cardW - 124, 1);
+    y += 34;
 
     // tagline
-    ctx.fillStyle = '#7c6b9e';
-    ctx.font = 'italic 26px "PingFang SC", sans-serif';
-    ctx.fillText('「' + r.tagline + '」', cx, cardY + 424);
-
-    // 分割线
-    ctx.strokeStyle = 'rgba(120,90,180,0.25)';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(cardX + 50, cardY + 460);
-    ctx.lineTo(cardX + cardW - 50, cardY + 460);
-    ctx.stroke();
-
-    // 描述（自动换行）
-    ctx.fillStyle = '#4a3a6b';
-    ctx.font = '26px "PingFang SC", sans-serif';
-    ctx.textAlign = 'left';
-    var descLines = wrapText(ctx, r.description, cardW - 110).slice(0, 5);
-    descLines.forEach(function (line, idx) {
-      ctx.fillText(line, cardX + 55, cardY + 512 + idx * 42);
-    });
-
-    // 技能列表（取前 2 个）
-    var sy = cardY + 512 + descLines.length * 42 + 26;
     ctx.textAlign = 'center';
-    ctx.fillStyle = r.color;
-    ctx.font = '800 26px "PingFang SC", sans-serif';
-    ctx.fillText('⚔ 觉醒技能 ⚔', cx, sy);
-    sy += 22;
-    ctx.textAlign = 'left';
-    r.skills.slice(0, 2).forEach(function (s) {
-      sy += 52;
-      roundRect(ctx, cardX + 55, sy - 34, cardW - 110, 52, 14);
-      ctx.fillStyle = 'rgba(120, 90, 180, 0.09)';
-      ctx.fill();
-      ctx.fillStyle = '#22103f';
-      ctx.font = '700 25px "PingFang SC", sans-serif';
-      ctx.fillText('· ' + s.name, cardX + 78, sy);
-      ctx.fillStyle = '#8a7bab';
-      ctx.font = '22px "PingFang SC", sans-serif';
-      var d = s.desc.length > 16 ? s.desc.slice(0, 16) + '…' : s.desc;
-      ctx.fillText(d, cardX + 78 + ctx.measureText('· ' + s.name).width + 16, sy);
+    ctx.fillStyle = INK;
+    ctx.font = '400 23px "PingFang SC", sans-serif';
+    ctx.fillText(r.tagline ? '「' + r.tagline + '」' : '', cx, y + 52);
+
+    // 描述（最多 2 行，超出加省略号）
+    ctx.fillStyle = SUB;
+    ctx.font = '400 21px "PingFang SC", sans-serif';
+    var allLines = wrapText(ctx, r.description, cardW - 124);
+    var maxLines = 2;
+    var lines = allLines.slice(0, maxLines);
+    if (allLines.length > maxLines) {
+      lines[maxLines - 1] = lines[maxLines - 1].slice(0, -1) + '…';
+    }
+    lines.forEach(function (line, i) {
+      ctx.fillText(line, cx, y + 100 + i * 36);
     });
 
-    // 底部：二维码 + CTA
-    var qrSize = 150;
-    var qrY = H - 240;
+    // 二维码区
+    var qrSize = 176;
+    var qrY = H - 286;
+    var qrX = 62;
+
+    ctx.save();
+    roundRect(ctx, qrX - 10, qrY - 10, qrSize + 20, qrSize + 20, 12);
+    ctx.fillStyle = '#ffffff';
+    ctx.fill();
+    ctx.restore();
+
     try {
-      // 二维码指向分享链接：优先取 share.url，否则用当前页面地址（保留 ?quiz= 参数，确保回到当前测试）
       var qrUrl = share.url || location.href.split('#')[0];
       var qr = qrcode(0, 'M');
       qr.addData(qrUrl);
       qr.make();
       var qrImg = new Image();
       qrImg.src = qr.createDataURL(6, 2);
-      // createDataURL 为同步字符串，直接绘制需等待加载
-      qrImg.onload = function () {
-        finishDraw(qrImg);
-      };
+      qrImg.onload = function () { finishDraw(qrImg); };
       qrImg.onerror = function () { finishDraw(null); };
     } catch (e) {
       finishDraw(null);
     }
 
     function finishDraw(qrImg) {
-      // 底部面板
-      roundRect(ctx, 55, qrY - 26, W - 110, 210, 26);
-      ctx.fillStyle = 'rgba(255,255,255,0.12)';
-      ctx.fill();
-
-      if (qrImg) {
-        ctx.save();
-        roundRect(ctx, 85, qrY, qrSize, qrSize, 16);
-        ctx.fillStyle = '#ffffff';
-        ctx.fill();
-        ctx.clip();
-        ctx.drawImage(qrImg, 91, qrY + 6, qrSize - 12, qrSize - 12);
-        ctx.restore();
-      }
+      if (qrImg) ctx.drawImage(qrImg, qrX, qrY, qrSize, qrSize);
 
       ctx.textAlign = 'left';
-      ctx.fillStyle = '#ffffff';
-      ctx.font = '800 34px "PingFang SC", "Microsoft YaHei", sans-serif';
-      ctx.fillText('你的天赋是什么？', 270, qrY + 52);
-      ctx.fillStyle = 'rgba(255,255,255,0.8)';
-      ctx.font = '25px "PingFang SC", sans-serif';
-      ctx.fillText(share.cta || '扫码测一测', 270, qrY + 96);
-      ctx.fillStyle = r.color;
-      ctx.font = '600 22px "PingFang SC", sans-serif';
-      ctx.fillText(share.hashtags || '', 270, qrY + 136);
+      ctx.fillStyle = INK;
+      ctx.font = '500 26px "PingFang SC", "Microsoft YaHei", sans-serif';
+      ctx.fillText(share.shareAsk || '你也来测测', 288, qrY + 56);
+
+      ctx.fillStyle = SUB;
+      ctx.font = '400 20px "PingFang SC", sans-serif';
+      ctx.fillText(share.cta || '长按识别二维码', 288, qrY + 104);
+
+      ctx.fillStyle = SUB;
+      ctx.font = '400 17px "PingFang SC", sans-serif';
+      ctx.fillText(share.hashtags || '', 288, qrY + 146);
+
+      ctx.textAlign = 'center';
+      ctx.fillStyle = SUB;
+      ctx.font = '400 16px "PingFang SC", sans-serif';
+      ctx.fillText(q.title, cx, H - 42);
 
       var url = canvas.toDataURL('image/png');
-      var img = $('share-img');
-      img.src = url;
+      $('share-img').src = url;
       $('share-modal').classList.add('open');
 
-      // 尝试触发下载（桌面端有效；移动端走长按保存）
       try {
         var a = document.createElement('a');
         a.href = url;
-        a.download = '异世界天赋-' + r.name + '.png';
+        a.download = label('downloadName', '测试结果') + '-' + r.name + '.png';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-      } catch (e) { /* 移动端忽略 */ }
+      } catch (e) { /* 移动端走长按保存 */ }
     }
   }
 
-  /* ---------- 事件绑定 ---------- */
+  /* ---------- 事件 ---------- */
   function bindEvents() {
     $('btn-start').addEventListener('click', startQuiz);
     $('btn-retry').addEventListener('click', function () { showScreen('home'); });
@@ -493,32 +551,28 @@
     applyTheme(quiz.theme);
     initHome();
     bindEvents();
-    showScreen('home');
+    showScreen('home');   // 数据就绪后才显示首页，避免闪到别的测试
   }
 
   function showError() {
-    $('home-title').textContent = '测试加载失败';
-    $('home-subtitle').textContent = '请通过 http 服务访问，或检查数据文件';
+    var boot = $('screen-boot');
+    if (boot) {
+      boot.innerHTML = '<div class="boot-inner"><p style="font-size:14px;color:#8b8680;letter-spacing:1px">加载失败，请刷新重试</p></div>';
+    }
   }
 
   function boot() {
-    // 优先从独立 JSON 文件加载（部署到 Pages 的标准方式）
-    // file:// 直接双击打开时 fetch 会被浏览器拦截，此时回退到内嵌数据
+    // 优先读独立 JSON；file:// 下 fetch 被拦截时回退内嵌数据
     fetch('data/' + QUIZ_ID + '.json')
       .then(function (res) {
         if (!res.ok) throw new Error('quiz not found');
         return res.json();
       })
-      .then(function (quiz) {
-        init(quiz);
-      })
+      .then(init)
       .catch(function () {
         var fallback = window.__QUIZZES__ && window.__QUIZZES__[QUIZ_ID];
-        if (fallback) {
-          init(fallback);
-        } else {
-          showError();
-        }
+        if (fallback) init(fallback);
+        else showError();
       });
   }
 

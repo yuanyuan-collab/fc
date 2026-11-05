@@ -1,233 +1,251 @@
 {
   "id": "charm",
   "title": "测测你在别人眼中的魅力值",
-  "subtitle": "12 道题，看看你的吸引力有多高",
-  "description": "从社交、情绪、气场多维度拆解你的魅力，看看别人眼里的你到底有多迷人",
-  "emoji": "💫",
+  "subtitle": "12 道题，看见别人眼中的你",
+  "description": "从外在气质、情绪价值、社交魅力到内在吸引力，给你一份完整的魅力画像。",
+  "emoji": "◐",
   "theme": {
-    "bg": "linear-gradient(160deg, #2b0a1e 0%, #5b1a4a 50%, #1a0f3c 100%)",
-    "primary": "#f472b6",
-    "accent": "#fbbf24",
-    "gold": "#fbbf24",
-    "cardBg": "rgba(255, 255, 255, 0.08)",
-    "cardBorder": "rgba(244, 114, 182, 0.35)",
-    "textMain": "#fff5fb",
-    "textSub": "rgba(255, 224, 240, 0.72)",
-    "decorEmojis": ["✨", "💖", "🌟", "💘", "😎", "🌹"],
-    "btnStyle": "gradient"
+    "bg": "#f7f5f2",
+    "surface": "#f0ede8",
+    "surfaceStrong": "#e8e4de",
+    "line": "rgba(28, 28, 28, 0.09)",
+    "textMain": "#1c1c1c",
+    "textSub": "#8b8680",
+    "primary": "#1c1c1c",
+    "accent": "#b08968",
+    "cardBg": "#ffffff",
+    "cardShadow": "0 1px 2px rgba(0, 0, 0, 0.04)",
+    "btnBg": "#1c1c1c",
+    "btnText": "#ffffff"
   },
+  "labels": {
+    "startBtn": "开始测试",
+    "homeTip": "人已完成测试",
+    "scoreCaption": "综合魅力值",
+    "resultBadge": "你的魅力画像",
+    "skillsHeading": "魅力解析",
+    "soulmatePrefix": "最来电类型",
+    "loadingText": "正在计算你的魅力值",
+    "shareBadge": "我的魅力画像",
+    "shareAsk": "你的魅力值是多少？",
+    "downloadName": "魅力值测试",
+    "swipeHint": "点选作答 · 左右滑动切换"
+  },
+  "dimensions": [
+    { "name": "外在吸引力", "weights": { "mystery": 0.45, "sun": 0.35, "funny": 0.2 } },
+    { "name": "情绪价值", "weights": { "gentle": 0.65, "sun": 0.2, "wise": 0.15 } },
+    { "name": "社交魅力", "weights": { "funny": 0.45, "sun": 0.4, "gentle": 0.15 } },
+    { "name": "内在魅力", "weights": { "wise": 0.55, "mystery": 0.35, "gentle": 0.1 } }
+  ],
   "questions": [
     {
       "id": 1,
       "text": "聚会时，你通常是哪种状态？",
       "options": [
-        { "text": "全场焦点，主动带动气氛", "scores": { "sun": 2, "funny": 1 } },
-        { "text": "和熟悉的人安静地聊天", "scores": { "gentle": 2, "wise": 1 } },
-        { "text": "观察大家，偶尔插一句金句", "scores": { "mystery": 2, "funny": 1 } },
-        { "text": "被朋友拉着才慢慢放开", "scores": { "gentle": 1, "sun": 1 } }
+        { "text": "全场焦点，主动带动气氛", "charm": 9, "scores": { "sun": 2, "funny": 1 } },
+        { "text": "和熟悉的人安静地聊天", "charm": 7, "scores": { "gentle": 2, "wise": 1 } },
+        { "text": "观察大家，偶尔插一句金句", "charm": 8, "scores": { "mystery": 2, "funny": 1 } },
+        { "text": "被朋友拉着才慢慢放开", "charm": 6, "scores": { "gentle": 1, "sun": 1 } }
       ]
     },
     {
       "id": 2,
       "text": "朋友遇到烦心事找你，你的第一反应是？",
       "options": [
-        { "text": "讲个笑话先把 TA 逗笑", "scores": { "funny": 2 } },
-        { "text": "安静倾听，陪着 TA 就好", "scores": { "gentle": 2 } },
-        { "text": "帮 TA 理性分析解决办法", "scores": { "wise": 2 } },
-        { "text": "拉 TA 出去散心转移注意力", "scores": { "sun": 2 } }
+        { "text": "讲个笑话先把 TA 逗笑", "charm": 8, "scores": { "funny": 2 } },
+        { "text": "安静倾听，陪着 TA 就好", "charm": 9, "scores": { "gentle": 2 } },
+        { "text": "帮 TA 理性分析解决办法", "charm": 8, "scores": { "wise": 2 } },
+        { "text": "拉 TA 出去散心转移注意力", "charm": 7, "scores": { "sun": 2 } }
       ]
     },
     {
       "id": 3,
       "text": "你的穿搭风格更接近哪种？",
       "options": [
-        { "text": "简约干净，舒服为主", "scores": { "gentle": 2, "wise": 1 } },
-        { "text": "有自己个性，敢穿敢搭", "scores": { "mystery": 2, "sun": 1 } },
-        { "text": "运动休闲，活力满满", "scores": { "sun": 2 } },
-        { "text": "精致讲究，注重细节", "scores": { "mystery": 2, "wise": 1 } }
+        { "text": "简约干净，舒服为主", "charm": 8, "scores": { "gentle": 2, "wise": 1 } },
+        { "text": "有自己个性，敢穿敢搭", "charm": 9, "scores": { "mystery": 2, "sun": 1 } },
+        { "text": "运动休闲，活力满满", "charm": 7, "scores": { "sun": 2 } },
+        { "text": "精致讲究，注重细节", "charm": 9, "scores": { "mystery": 2, "wise": 1 } }
       ]
     },
     {
       "id": 4,
       "text": "别人对你的第一印象通常是？",
       "options": [
-        { "text": "很好接近，想跟你说话", "scores": { "sun": 2, "gentle": 1 } },
-        { "text": "有点高冷，但很吸引人", "scores": { "mystery": 2 } },
-        { "text": "靠谱，感觉什么都能解决", "scores": { "wise": 2, "gentle": 1 } },
-        { "text": "有趣，跟你待着不无聊", "scores": { "funny": 2, "sun": 1 } }
+        { "text": "很好接近，想跟你说话", "charm": 9, "scores": { "sun": 2, "gentle": 1 } },
+        { "text": "有点高冷，但很吸引人", "charm": 8, "scores": { "mystery": 2 } },
+        { "text": "靠谱，感觉什么都能解决", "charm": 8, "scores": { "wise": 2, "gentle": 1 } },
+        { "text": "有趣，跟你待着不无聊", "charm": 9, "scores": { "funny": 2, "sun": 1 } }
       ]
     },
     {
       "id": 5,
       "text": "到一个陌生环境里，你会？",
       "options": [
-        { "text": "主动去认识新朋友", "scores": { "sun": 2 } },
-        { "text": "先观察一圈再行动", "scores": { "mystery": 2, "wise": 1 } },
-        { "text": "跟身边的人自然地聊起来", "scores": { "gentle": 2, "funny": 1 } },
-        { "text": "用实力和能力证明自己", "scores": { "wise": 2 } }
+        { "text": "主动去认识新朋友", "charm": 9, "scores": { "sun": 2 } },
+        { "text": "先观察一圈再行动", "charm": 8, "scores": { "mystery": 2, "wise": 1 } },
+        { "text": "跟身边的人自然地聊起来", "charm": 7, "scores": { "gentle": 2, "funny": 1 } },
+        { "text": "用实力和能力证明自己", "charm": 8, "scores": { "wise": 2 } }
       ]
     },
     {
       "id": 6,
       "text": "你觉得最有吸引力的瞬间是？",
       "options": [
-        { "text": "笑起来的时候", "scores": { "sun": 2, "gentle": 1 } },
-        { "text": "专注做一件事的时候", "scores": { "wise": 2, "mystery": 1 } },
-        { "text": "聊天讲段子的时候", "scores": { "funny": 2 } },
-        { "text": "安静不说话待着的时候", "scores": { "mystery": 2, "gentle": 1 } }
+        { "text": "笑起来的时候", "charm": 9, "scores": { "sun": 2, "gentle": 1 } },
+        { "text": "专注做一件事的时候", "charm": 9, "scores": { "wise": 2, "mystery": 1 } },
+        { "text": "聊天讲段子的时候", "charm": 8, "scores": { "funny": 2 } },
+        { "text": "安静不说话待着的时候", "charm": 8, "scores": { "mystery": 2, "gentle": 1 } }
       ]
     },
     {
       "id": 7,
       "text": "有人说「你好特别」，你觉得是因为？",
       "options": [
-        { "text": "我的性格很鲜明", "scores": { "sun": 2, "funny": 1 } },
-        { "text": "我的气质很独特", "scores": { "mystery": 2 } },
-        { "text": "我的温柔让人舒服", "scores": { "gentle": 2 } },
-        { "text": "我的想法很深刻", "scores": { "wise": 2 } }
+        { "text": "我的性格很鲜明", "charm": 8, "scores": { "sun": 2, "funny": 1 } },
+        { "text": "我的气质很独特", "charm": 9, "scores": { "mystery": 2 } },
+        { "text": "我的温柔让人舒服", "charm": 9, "scores": { "gentle": 2 } },
+        { "text": "我的想法很深刻", "charm": 8, "scores": { "wise": 2 } }
       ]
     },
     {
       "id": 8,
       "text": "你的朋友圈发得最多的是？",
       "options": [
-        { "text": "生活日常和自拍", "scores": { "sun": 2, "gentle": 1 } },
-        { "text": "很少发，保持点神秘", "scores": { "mystery": 2 } },
-        { "text": "段子和搞笑内容", "scores": { "funny": 2 } },
-        { "text": "观点、思考、书影音", "scores": { "wise": 2 } }
+        { "text": "生活日常和自拍", "charm": 8, "scores": { "sun": 2, "gentle": 1 } },
+        { "text": "很少发，保持点神秘", "charm": 9, "scores": { "mystery": 2 } },
+        { "text": "段子和搞笑内容", "charm": 8, "scores": { "funny": 2 } },
+        { "text": "观点、思考、书影音", "charm": 8, "scores": { "wise": 2 } }
       ]
     },
     {
       "id": 9,
       "text": "约会/相处时，你更看重什么？",
       "options": [
-        { "text": "轻松好玩，别太正式", "scores": { "sun": 2, "funny": 1 } },
-        { "text": "氛围和心意", "scores": { "gentle": 2 } },
-        { "text": "聊得深不深、合不合拍", "scores": { "wise": 2, "mystery": 1 } },
-        { "text": "有没有新鲜感和惊喜", "scores": { "mystery": 2, "funny": 1 } }
+        { "text": "轻松好玩，别太正式", "charm": 8, "scores": { "sun": 2, "funny": 1 } },
+        { "text": "氛围和心意", "charm": 9, "scores": { "gentle": 2 } },
+        { "text": "聊得深不深、合不合拍", "charm": 8, "scores": { "wise": 2, "mystery": 1 } },
+        { "text": "有没有新鲜感和惊喜", "charm": 8, "scores": { "mystery": 2, "funny": 1 } }
       ]
     },
     {
       "id": 10,
       "text": "别人伤心时，你最能提供的情绪价值是？",
       "options": [
-        { "text": "陪你哭陪你笑", "scores": { "gentle": 2 } },
-        { "text": "逗你笑", "scores": { "funny": 2 } },
-        { "text": "拉你出来嗨", "scores": { "sun": 2 } },
-        { "text": "给你讲道理分析", "scores": { "wise": 2 } }
+        { "text": "陪你哭陪你笑", "charm": 9, "scores": { "gentle": 2 } },
+        { "text": "逗你笑", "charm": 9, "scores": { "funny": 2 } },
+        { "text": "拉你出来嗨", "charm": 7, "scores": { "sun": 2 } },
+        { "text": "给你讲道理分析", "charm": 7, "scores": { "wise": 2 } }
       ]
     },
     {
       "id": 11,
       "text": "你觉得自己身上最迷人的特质是？",
       "options": [
-        { "text": "真诚和善良", "scores": { "gentle": 2, "sun": 1 } },
-        { "text": "自信和个性", "scores": { "mystery": 2, "sun": 1 } },
-        { "text": "幽默和有趣", "scores": { "funny": 2 } },
-        { "text": "沉稳和智慧", "scores": { "wise": 2, "mystery": 1 } }
+        { "text": "真诚和善良", "charm": 9, "scores": { "gentle": 2, "sun": 1 } },
+        { "text": "自信和个性", "charm": 9, "scores": { "mystery": 2, "sun": 1 } },
+        { "text": "幽默和有趣", "charm": 8, "scores": { "funny": 2 } },
+        { "text": "沉稳和智慧", "charm": 9, "scores": { "wise": 2, "mystery": 1 } }
       ]
     },
     {
       "id": 12,
       "text": "深夜你会为什么 emo？",
       "options": [
-        { "text": "很少 emo，睡一觉就好", "scores": { "sun": 2, "funny": 1 } },
-        { "text": "为在乎的人担心", "scores": { "gentle": 2 } },
-        { "text": "思考人生和未来", "scores": { "wise": 2, "mystery": 1 } },
-        { "text": "觉得没人真正懂自己", "scores": { "mystery": 2, "gentle": 1 } }
+        { "text": "很少 emo，睡一觉就好", "charm": 9, "scores": { "sun": 2, "funny": 1 } },
+        { "text": "为在乎的人担心", "charm": 8, "scores": { "gentle": 2 } },
+        { "text": "思考人生和未来", "charm": 8, "scores": { "wise": 2, "mystery": 1 } },
+        { "text": "觉得没人真正懂自己", "charm": 6, "scores": { "mystery": 2, "gentle": 1 } }
       ]
     }
   ],
   "results": {
     "sun": {
       "name": "阳光小太阳",
-      "emoji": "☀️",
-      "title": "魅力值 95+ · 超新星",
+      "emoji": "☀",
       "tagline": "你一出现，空气都变暖了",
       "description": "你是自带光热的存在，走到哪都能照亮一群人。你的魅力来自真诚的活力与感染力，让人忍不住想靠近、想跟你做朋友。你未必是最耀眼的那一个，但一定是最让人念念不忘的那一个。",
       "skills": [
-        { "name": "能量磁场", "desc": "靠近你就元气满满，emo 都被你赶跑" },
-        { "name": "社交加速器", "desc": "三句话让陌生人升起好感" },
-        { "name": "笑容杀手", "desc": "你的笑有治愈全场的魔力" },
-        { "name": "行动号召力", "desc": "你说「走」，没人会说不" }
+        { "name": "能量磁场", "desc": "靠近你就元气满满，低落情绪会被你不经意地带走。" },
+        { "name": "社交加速器", "desc": "不需要刻意，三句话就能让陌生人放下戒备。" },
+        { "name": "笑容杀手", "desc": "你的笑是天然的氛围开关，能把整桌人的情绪拉起来。" },
+        { "name": "行动号召力", "desc": "你说「走」，很少有人会拒绝，这是信任感带来的影响力。" }
       ],
-      "traits": ["真诚热情", "感染力MAX", "行动派"],
+      "traits": ["真诚热情", "感染力强", "行动派"],
       "soulmate": "温柔治愈系",
       "color": "#f59e0b",
       "gradient": ["#f7971e", "#ffd200"]
     },
     "gentle": {
       "name": "温柔治愈系",
-      "emoji": "🍃",
-      "title": "魅力值 92 · 治愈天花板",
+      "emoji": "◍",
       "tagline": "你什么都没做，却治愈了所有人",
-      "description": "你的魅力是润物细无声的温柔。跟你相处像泡在温水里，焦虑被抚平，疲惫被接住。你未必是聚会上最抢眼的，但一定是大家深夜倾诉时第一个想到的人。",
+      "description": "你的魅力是润物细无声的温柔。跟你相处像泡在温水里，焦虑被抚平，疲惫被接住。你未必是聚会上最抢眼的，但一定是大家深夜倾诉时第一个想到的人。真正的吸引力，往往就是这种让人安心的能力。",
       "skills": [
-        { "name": "情绪容器", "desc": "再大的情绪风暴到你这里都化为平静" },
-        { "name": "共情雷达", "desc": "不用开口你就懂" },
-        { "name": "温柔刀", "desc": "以柔克刚，让人甘愿卸下防备" },
-        { "name": "长情体质", "desc": "相处越久越离不开你" }
+        { "name": "情绪容器", "desc": "再大的情绪风暴到你这里，都会被慢慢接住、化开。" },
+        { "name": "共情雷达", "desc": "别人还没开口，你已经察觉到那点不对劲。" },
+        { "name": "温柔刀", "desc": "以柔克刚，让人心甘情愿卸下防备。" },
+        { "name": "长情体质", "desc": "相处越久越离不开你，这是时间给你的加分项。" }
       ],
-      "traits": ["温柔坚定", "共情MAX", "治愈系"],
+      "traits": ["温柔坚定", "共情力强", "治愈系"],
       "soulmate": "阳光小太阳",
-      "color": "#f472b6",
+      "color": "#d98ba0",
       "gradient": ["#ff758c", "#ff7eb3"]
     },
     "funny": {
       "name": "人间开心果",
-      "emoji": "🎭",
-      "title": "魅力值 93 · 气氛担当",
+      "emoji": "◒",
       "tagline": "有你在的局，永远不会冷场",
-      "description": "你的魅力在于一颗有趣的灵魂。你总能一句话把气氛盘活，让人在不知不觉中笑出声。你未必靠颜值取胜，但跟你聊天上头、相处上瘾，是所有人默认的快乐源泉。",
+      "description": "你的魅力在于一颗有趣的灵魂。你总能一句话把气氛盘活，让人在不知不觉中笑出声。你未必靠外表取胜，但跟你聊天上头、相处上瘾，是所有人默认的快乐源泉。好看的皮囊很多，有趣的你只有一个。",
       "skills": [
-        { "name": "段子手本能", "desc": "随手就是金句，笑点精准" },
-        { "name": "尴尬粉碎机", "desc": "再冷的场子你也能救回来" },
-        { "name": "快乐感染力", "desc": "你的笑声会传染" },
-        { "name": "反差萌", "desc": "认真起来更让人心动" }
+        { "name": "段子手本能", "desc": "随手就是金句，笑点精准，不油腻。" },
+        { "name": "尴尬粉碎机", "desc": "再冷的场子，你也能用一句话救回来。" },
+        { "name": "快乐感染力", "desc": "你的笑声会传染，这是最难得的情绪价值。" },
+        { "name": "反差萌", "desc": "平时嘻嘻哈哈，认真起来反而更让人心动。" }
       ],
-      "traits": ["幽默有趣", "灵魂有趣", "快乐源泉"],
+      "traits": ["幽默有趣", "灵魂鲜活", "快乐源泉"],
       "soulmate": "智慧沉稳型",
-      "color": "#facc15",
+      "color": "#c9a227",
       "gradient": ["#f9d423", "#ff4e50"]
     },
     "mystery": {
       "name": "神秘高冷系",
-      "emoji": "🖤",
-      "title": "魅力值 94 · 禁欲天花板",
+      "emoji": "◑",
       "tagline": "你不主动，却让人忍不住沦陷",
-      "description": "你的魅力是留白和想象空间。你话不多、不刻意讨好，却自带让人想一探究竟的引力。你越是保持距离，别人越是想靠近；你越神秘，越让人上头。",
+      "description": "你的魅力是留白和想象空间。你话不多、不刻意讨好，却自带让人想一探究竟的引力。你越是保持距离，别人越是想靠近；你越神秘，越让人上头。你的高级感，来自那份不费力的自持。",
       "skills": [
-        { "name": "神秘光环", "desc": "距离产生美，越远越迷人" },
-        { "name": "一眼万年", "desc": "不声不响就让人记住你" },
-        { "name": "高冷反差", "desc": "偶尔的温柔最致命" },
-        { "name": "品味气场", "desc": "你的存在本身就很高级" }
+        { "name": "神秘光环", "desc": "距离产生美，你从不把自己一次性交代完。" },
+        { "name": "一眼万年", "desc": "不声不响，却让人在人群里第一眼记住你。" },
+        { "name": "高冷反差", "desc": "偶尔露出的温柔，比一直温柔更致命。" },
+        { "name": "品味气场", "desc": "你的存在本身就是一种审美表达。" }
       ],
-      "traits": ["神秘高级", "自带气场", "反差致命"],
+      "traits": ["神秘高级", "自带气场", "反差感"],
       "soulmate": "人间开心果",
-      "color": "#8b5cf6",
+      "color": "#7c6a9c",
       "gradient": ["#7f00ff", "#e100ff"]
     },
     "wise": {
       "name": "智慧沉稳型",
-      "emoji": "📚",
-      "title": "魅力值 96 · 内涵天花板",
+      "emoji": "◼",
+      "title": "越相处越着迷",
       "tagline": "越相处，越觉得你深不可测",
-      "description": "你的魅力来自脑子里的东西。你不慌不忙、言之有物，遇到问题永远是最靠得住的那一个。初见未必惊艳，但一旦聊起来，就会让人陷进你的世界，越了解越上头。",
+      "description": "你的魅力来自脑子里的东西。你不慌不忙、言之有物，遇到问题永远是最靠得住的那一个。初见未必惊艳，但一旦聊起来，就会让人陷进你的世界，越了解越上头。这是一种耐看、也耐时间的吸引力。",
       "skills": [
-        { "name": "稳定内核", "desc": "天塌下来你也是那个定盘星" },
-        { "name": "一眼看透", "desc": "洞察力拉满，句句说到点上" },
-        { "name": "靠谱体质", "desc": "答应你的事没有办不成的" },
-        { "name": "深聊杀器", "desc": "聊深了，就离不开了" }
+        { "name": "稳定内核", "desc": "天塌下来你也是那个定盘星，让人本能地想依赖。" },
+        { "name": "一眼看透", "desc": "洞察力拉满，说话总能落在最关键的点上。" },
+        { "name": "靠谱体质", "desc": "答应你的事没有办不成的，这是最高级的性感。" },
+        { "name": "深聊杀器", "desc": "聊到第三层，对方基本就离不开了。" }
       ],
-      "traits": ["沉稳靠谱", "洞察力MAX", "越处越上头"],
+      "traits": ["沉稳靠谱", "洞察力强", "耐看型"],
       "soulmate": "温柔治愈系",
-      "color": "#3b82f6",
+      "color": "#5a7d8c",
       "gradient": ["#4facfe", "#00f2fe"]
     }
   },
   "share": {
-    "slogan": "测测你在别人眼中的魅力值",
-    "hashtags": "#魅力值测试 #吸引力测试 #趣味测试",
-    "cta": "长按识别二维码，测测你的魅力值"
+    "slogan": "魅力值测试",
+    "hashtags": "#魅力值测试 #吸引力 #性格测试",
+    "cta": "长按识别，看看你的魅力值",
+    "shareAsk": "你的魅力值是多少？"
   }
 }

@@ -3,36 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-<meta name="theme-color" content="#1a0533">
-<title>测测你在异世界的天赋</title>
-<meta name="description" content="10道灵魂拷问，觉醒你的异世界隐藏天赋">
+<meta name="theme-color" content="#f7f5f2">
+<title>趣味测试</title>
+<meta name="description" content="用几道题，看见不一样的自己">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div id="app">
 
+  <!-- 启动屏（避免数据加载前闪现错误测试的文案） -->
+  <section id="screen-boot" class="screen active">
+    <div class="boot-inner">
+      <div class="boot-spinner"></div>
+    </div>
+  </section>
+
   <!-- 首页 -->
-  <section id="screen-home" class="screen active">
-    <div class="decor-layer" id="decor-home"></div>
+  <section id="screen-home" class="screen">
     <div class="home-inner">
-      <div class="home-emoji" id="home-emoji">🔮</div>
-      <h1 class="home-title" id="home-title">测测你在异世界的天赋</h1>
+      <div class="home-emoji" id="home-emoji"></div>
+      <h1 class="home-title" id="home-title"></h1>
       <p class="home-subtitle" id="home-subtitle"></p>
       <p class="home-desc" id="home-desc"></p>
-      <button class="btn-primary btn-press" id="btn-start">
-        <span class="btn-text">✨ 开始觉醒 ✨</span>
-      </button>
-      <p class="home-tip">🔥 已有 <span id="play-count">0</span> 人觉醒天赋</p>
+      <div class="home-spacer"></div>
+      <button class="btn-primary btn-press" id="btn-start"><span id="btn-start-text">开始测试</span></button>
+      <p class="home-tip"><span id="play-count">0</span> 人已完成</p>
     </div>
   </section>
 
   <!-- 答题页 -->
   <section id="screen-quiz" class="screen">
-    <div class="decor-layer" id="decor-quiz"></div>
     <div class="quiz-header">
       <div class="progress-info">
-        <span id="quiz-step">1 / 10</span>
-        <span class="progress-pct" id="quiz-pct">10%</span>
+        <span id="quiz-step">1 / 1</span>
+        <span class="progress-pct" id="quiz-pct">0%</span>
       </div>
       <div class="progress-track">
         <div class="progress-bar" id="progress-bar"></div>
@@ -40,47 +44,54 @@
     </div>
     <div class="quiz-body" id="quiz-body">
       <div class="question-card" id="question-card">
-        <div class="q-num" id="q-num">Q1</div>
+        <div class="q-num" id="q-num">01</div>
         <h2 class="q-text" id="q-text"></h2>
         <div class="options" id="options"></div>
       </div>
     </div>
     <div class="quiz-footer">
-      <span class="swipe-hint">👆 点选作答 · 左右滑动切换题目</span>
+      <span class="swipe-hint" id="swipe-hint">点选作答 · 左右滑动切换</span>
     </div>
   </section>
 
   <!-- 加载页 -->
   <section id="screen-loading" class="screen">
-    <div class="decor-layer" id="decor-loading"></div>
     <div class="loading-inner">
-      <div class="loading-orb">🔮</div>
-      <p class="loading-text">命运之轮转动中…</p>
-      <div class="loading-dots"><i></i><i></i><i></i></div>
+      <div class="loading-line"></div>
+      <p class="loading-text" id="loading-text">正在计算</p>
     </div>
   </section>
 
   <!-- 结果页 -->
   <section id="screen-result" class="screen">
-    <div class="decor-layer" id="decor-result"></div>
     <div class="result-scroll">
       <div class="result-card" id="result-card">
-        <div class="result-badge" id="result-badge">你的异世界天赋</div>
-        <div class="result-emoji" id="result-emoji">🔥</div>
+        <div class="result-badge" id="result-badge"></div>
+        <div class="result-emoji" id="result-emoji"></div>
         <h2 class="result-name" id="result-name"></h2>
-        <div class="result-title" id="result-title"></div>
         <p class="result-tagline" id="result-tagline"></p>
-        <div class="result-divider"><span>✦ ✦ ✦</span></div>
+
+        <!-- 综合评分 + 维度 -->
+        <div class="score-block" id="score-block" hidden>
+          <div class="score-main">
+            <span class="score-num" id="score-num">--</span>
+            <span class="score-total">/100</span>
+          </div>
+          <div class="score-caption" id="score-caption">综合魅力值</div>
+          <div class="dims" id="dims"></div>
+        </div>
+
+        <div class="result-divider"></div>
         <p class="result-desc" id="result-desc"></p>
         <div class="result-traits" id="result-traits"></div>
         <div class="result-skills" id="result-skills"></div>
         <div class="result-soulmate" id="result-soulmate"></div>
       </div>
       <div class="result-actions">
-        <button class="btn-primary btn-press" id="btn-save">📸 保存结果图</button>
-        <button class="btn-ghost btn-press" id="btn-retry">🔄 再测一次</button>
+        <button class="btn-primary btn-press" id="btn-save">保存结果图</button>
+        <button class="btn-ghost btn-press" id="btn-retry">再测一次</button>
       </div>
-      <p class="result-tip">截图或保存图片，分享你的天赋吧～</p>
+      <p class="result-tip">保存图片或截图，分享你的结果</p>
     </div>
   </section>
 
@@ -88,7 +99,7 @@
   <div id="share-modal" class="modal">
     <div class="modal-mask" id="modal-mask"></div>
     <div class="modal-body">
-      <p class="modal-tip">👇 长按图片保存到相册</p>
+      <p class="modal-tip">长按图片保存到相册</p>
       <img id="share-img" class="share-img" alt="分享图">
       <button class="btn-ghost btn-press" id="btn-close-modal">关闭</button>
     </div>
