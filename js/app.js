@@ -378,8 +378,18 @@
     ctx.font = '400 22px "PingFang SC", "Microsoft YaHei", sans-serif';
     ctx.fillText(share.slogan || q.title, cx, 62);
 
-    // 主卡
-    var cardX = 48, cardY = 96, cardW = W - 96, cardH = hasScore ? 880 : 860;
+    // 主卡：先测量描述行数，无评分时按内容自适应高度，避免空白
+    var cardX = 48, cardY = 96, cardW = W - 96;
+    var innerW = cardW - 124;
+    ctx.font = '400 21px "PingFang SC", sans-serif';
+    var maxLines = hasScore ? 2 : 6;
+    var allDescLines = wrapText(ctx, r.description, innerW);
+    var descLines = allDescLines.slice(0, maxLines);
+    if (allDescLines.length > maxLines) {
+      descLines[maxLines - 1] = descLines[maxLines - 1].slice(0, -1) + '…';
+    }
+    var cardH = hasScore ? 880 : (350 + (descLines.length - 1) * 36 + 60);
+
     ctx.save();
     ctx.shadowColor = 'rgba(0,0,0,0.05)';
     ctx.shadowBlur = 30;
@@ -458,22 +468,16 @@
     ctx.font = '400 23px "PingFang SC", sans-serif';
     ctx.fillText(r.tagline ? '「' + r.tagline + '」' : '', cx, y + 52);
 
-    // 描述（最多 2 行，超出加省略号）
+    // 描述（行数与省略号已在测量阶段处理）
     ctx.fillStyle = SUB;
     ctx.font = '400 21px "PingFang SC", sans-serif';
-    var allLines = wrapText(ctx, r.description, cardW - 124);
-    var maxLines = 2;
-    var lines = allLines.slice(0, maxLines);
-    if (allLines.length > maxLines) {
-      lines[maxLines - 1] = lines[maxLines - 1].slice(0, -1) + '…';
-    }
-    lines.forEach(function (line, i) {
+    descLines.forEach(function (line, i) {
       ctx.fillText(line, cx, y + 100 + i * 36);
     });
 
-    // 二维码区
+    // 二维码区：有评分时贴底，无评分时紧跟卡片下方
     var qrSize = 176;
-    var qrY = H - 286;
+    var qrY = hasScore ? (H - 286) : (cardY + cardH + 110);
     var qrX = 62;
 
     ctx.save();

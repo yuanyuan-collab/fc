@@ -16,6 +16,14 @@
       "subtitle": "12 道题，看看你的吸引力有多高",
       "emoji": "💫",
       "hot": true
+    },
+    {
+      "id": "celebrity",
+      "file": "data/celebrity.json",
+      "title": "你跟历史哪位名人最像",
+      "subtitle": "12 道题，照见你的历史镜像",
+      "emoji": "册",
+      "hot": true
     }
   ]
 }
