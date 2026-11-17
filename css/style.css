@@ -569,3 +569,26 @@ html, body {
   border-style: solid;
   border-color: var(--line);
 }
+
+/* ============ 深色神秘主题（theme.style = "noir"） ============ */
+#app[data-style="noir"]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(72% 42% at 50% -8%, rgba(139, 123, 216, 0.2), transparent 62%),
+    radial-gradient(66% 40% at 50% 106%, rgba(58, 76, 132, 0.16), transparent 66%);
+}
+
+#app[data-style="noir"] .progress-bar { background: var(--accent); }
+
+#app[data-style="noir"] .option {
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+#app[data-style="noir"] .result-card {
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}

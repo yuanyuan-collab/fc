@@ -429,13 +429,16 @@
     canvas.width = W;
     canvas.height = H;
     var ctx = canvas.getContext('2d');
-    var INK = '#1c1c1c';
-    var SUB = '#8b8680';
-    var LINE = 'rgba(28,28,28,0.09)';
+    var darkShare = !!(share.dark);
+    var INK = darkShare ? '#ece8f6' : '#1c1c1c';
+    var SUB = darkShare ? 'rgba(220, 214, 236, 0.6)' : '#8b8680';
+    var LINE = darkShare ? 'rgba(255, 255, 255, 0.13)' : 'rgba(28,28,28,0.09)';
+    var PAGE_BG = darkShare ? '#100e18' : '#f7f5f2';
+    var CARD_BG = darkShare ? 'rgba(255, 255, 255, 0.06)' : '#ffffff';
     var cx = W / 2;
 
     // 背景
-    ctx.fillStyle = '#f7f5f2';
+    ctx.fillStyle = PAGE_BG;
     ctx.fillRect(0, 0, W, H);
 
     // 顶部标题
@@ -457,11 +460,11 @@
     var cardH = hasScore ? 880 : (350 + (descLines.length - 1) * 36 + 60);
 
     ctx.save();
-    ctx.shadowColor = 'rgba(0,0,0,0.05)';
+    ctx.shadowColor = darkShare ? 'rgba(0,0,0,0.5)' : 'rgba(0,0,0,0.05)';
     ctx.shadowBlur = 30;
     ctx.shadowOffsetY = 8;
     roundRect(ctx, cardX, cardY, cardW, cardH, 20);
-    ctx.fillStyle = '#ffffff';
+    ctx.fillStyle = CARD_BG;
     ctx.fill();
     ctx.restore();
 

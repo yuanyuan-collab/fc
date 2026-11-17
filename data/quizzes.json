@@ -21,8 +21,16 @@
       "id": "celebrity",
       "file": "data/celebrity.json",
       "title": "你跟历史哪位名人最像",
-      "subtitle": "12 道题，照见你的历史镜像",
-      "emoji": "册",
+      "subtitle": "24 道题，照见你的历史镜像",
+      "emoji": "",
+      "hot": true
+    },
+    {
+      "id": "darkside",
+      "file": "data/darkside.json",
+      "title": "测测你的阴暗面是什么",
+      "subtitle": "12 道题，照见你不常示人的那一面",
+      "emoji": "",
       "hot": true
     }
   ]
